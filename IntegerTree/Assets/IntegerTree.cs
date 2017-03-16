@@ -1,6 +1,7 @@
-//IAN CLINKENBEARD
+﻿//IAN CLINKENBEARD
 
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -57,12 +58,17 @@ public class IntegerTree : MonoBehaviour {
 	*/
 	public List <Node> nodes = new List<Node>();
 
+	//Reference to the UI text element used to display the integer tree
+	public Text displayText;
+
 	void Start () {
 	
 		//Creates the node tree
 		CreateTree ();
 		//Assigns values for all nodes
 		AssignAllNodeValues ();
+		//Displays the tree
+		DisplayTree ();
 	}
 
 	///Creates the node tree from the specified number of levels
@@ -102,7 +108,7 @@ public class IntegerTree : MonoBehaviour {
 		}
 	}
 
-	//Assigns the correct value, parent and neighbors for each node in the nodes list
+	///Assigns the correct value, parent and neighbors for each node in the nodes list
 	void AssignAllNodeValues () {
 
 		//Goes through each node, except for the root node
@@ -115,7 +121,7 @@ public class IntegerTree : MonoBehaviour {
 		}
 	}
 
-	//Assigns the correct value, parent, and neighbors for the given node
+	///Assigns the correct value, parent, and neighbors for the given node
 	void AssignNodeValues (Node node) {
 
 		//Makes sure this is not the root node and exits the function if it is
@@ -172,29 +178,58 @@ public class IntegerTree : MonoBehaviour {
 			node.value += node.parent.rightNeighbor.value;
 		}
 	}
-}
 
-		bool makeLeftNeighbor = false;
+	///Displays the integer tree on-screen as a text object
+	void DisplayTree () {
 
-		//Goes through each row of nodes that needs be created, specified by the input value
-		for (int row = 1; row <= inputValue; row++) {
+		//This empty string will be added to then displayed on the screen
+		string treeText = " ";
+		//Keeps track of the number of nodes that need to be displayed for the current row
+		int nodesPerRow = 1;
+		//Used to keep track of the loop's position in each row
+		int rowIndex = 1;
+		//Determines how many spaces will be inbetween each node on the current line
+		int numberOfSpaces = inputValue * inputValue;
 
-			//Goes through each node that needs to be created for this row
-			for (int i = 0; i < nodesPerRow; i++) {
+		//Goes through each node in the tree
+		for (int i = 0; i < nodes.Count; i++) {
 
-				//Creates a new node and adds it to the list of nodes
-				Node newNode = new Node (row, nodesIndex, makeLeftNeighbor);
-				nodes.Add (newNode);
+			//Inserts the value of this node at the end of the string
+			treeText = treeText.Insert (treeText.Length - 1, "" + nodes [i].value);
 
-				//Increments nodes index and switches makeLeftNeighbor bool
-				nodesIndex++;
-				makeLeftNeighbor = !makeLeftNeighbor;
+			//If all of the nodes in this row have been inserted
+			if (rowIndex == 1) {
+
+				//Inserts a new line and moves onto the next row
+				treeText = treeText.Insert (treeText.Length - 1, "\n");
+
+				//Doubles nodesPerRow since each row has double the amount of nodes as the row above
+				nodesPerRow *= 2;
+				//Resets row index
+				rowIndex = nodesPerRow;
+
+				//Divides number of spaces by two so the nodes on the next row will be spaced closer together
+				numberOfSpaces = (int)((float)numberOfSpaces * 0.5f);
+
+				if (numberOfSpaces < 1) {
+					numberOfSpaces = 1;
+				}
+
+			} 
+			//If not all of the nodes in this row have been inserted yet
+			else {
+
+				//Inserts spaces
+				for (int j = 0; j < (numberOfSpaces); j++) {
+					treeText = treeText.Insert (treeText.Length - 1, "_");
+				}
+
+				//Decrements row index
+				rowIndex--;
 			}
-
-			//Before moving onto the next row, doubles nodesPerRow
-			//Since each row has double the amount of nodes as the row above
-			nodesPerRow *= 2;
 		}
-	}
 
+		//Displays the text on the screen
+		displayText.text = treeText;
+	}
 }
